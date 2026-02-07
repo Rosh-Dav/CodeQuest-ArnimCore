@@ -105,65 +105,66 @@ class _AIMentorWidgetState extends State<AIMentorWidget> with SingleTickerProvid
 
         const SizedBox(height: 32),
 
-        // Greeting Bubble
-        Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppTheme.idePanel.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: _mentorColor, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 20,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Text(
-                widget.greeting,
-                style: AppTheme.bodyStyle.copyWith(
-                  fontSize: 16,
-                  height: 1.6,
-                ),
-                textAlign: TextAlign.center,
-              ),
-
-              if (widget.showWaveform) ...[
-                const SizedBox(height: 16),
-                // Voice Waveform
-                AnimatedBuilder(
-                  animation: _waveController,
-                  builder: (context, child) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        final height = 20 +
-                            (30 *
-                                (0.5 +
-                                    0.5 *
-                                        (index % 2 == 0
-                                            ? _waveController.value
-                                            : 1 - _waveController.value)));
-                        return Container(
-                          width: 4,
-                          height: height,
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          decoration: BoxDecoration(
-                            color: _mentorColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        );
-                      }),
-                    );
-                  },
+        if (widget.greeting.trim().isNotEmpty || widget.showWaveform)
+          Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppTheme.idePanel.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: _mentorColor, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 20,
                 ),
               ],
-            ],
-          ),
-        ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.3, end: 0),
+            ),
+            child: Column(
+              children: [
+                if (widget.greeting.trim().isNotEmpty)
+                  Text(
+                    widget.greeting,
+                    style: AppTheme.bodyStyle.copyWith(
+                      fontSize: 16,
+                      height: 1.6,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                if (widget.showWaveform) ...[
+                  if (widget.greeting.trim().isNotEmpty) const SizedBox(height: 16),
+                  // Voice Waveform
+                  AnimatedBuilder(
+                    animation: _waveController,
+                    builder: (context, child) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(5, (index) {
+                          final height = 20 +
+                              (30 *
+                                  (0.5 +
+                                      0.5 *
+                                          (index % 2 == 0
+                                              ? _waveController.value
+                                              : 1 - _waveController.value)));
+                          return Container(
+                            width: 4,
+                            height: height,
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            decoration: BoxDecoration(
+                              color: _mentorColor,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                          );
+                        }),
+                      );
+                    },
+                  ),
+                ],
+              ],
+            ),
+          ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.3, end: 0),
       ],
     );
   }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../utils/bytestar_theme.dart';
+import '../../utils/theme.dart';
 import '../../models/bytestar_data.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/c_code_editor.dart';
 import '../../widgets/bytestar/space_backgrounds.dart'; // Audio/Visual
 import '../../widgets/bytestar/animated_space_background.dart';
+import '../../widgets/background/code_background.dart';
 import '../../services/judge0_service.dart';
 import '../../services/mock_c_compiler.dart';
 import '../../services/gemini_service.dart'; // AI Logic
@@ -16,8 +18,13 @@ import '../../utils/dialogue_queue.dart';
 
 class MissionEngineScreen extends StatefulWidget {
   final Mission mission;
+  final String mentorName;
 
-  const MissionEngineScreen({super.key, required this.mission});
+  const MissionEngineScreen({
+    super.key,
+    required this.mission,
+    this.mentorName = 'NOVA',
+  });
 
   @override
   State<MissionEngineScreen> createState() => _MissionEngineScreenState();
@@ -101,6 +108,16 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
     super.dispose();
   }
 
+  bool get _isRuneCity => widget.mentorName.toUpperCase() == 'LUNA';
+  Color get _accent => _isRuneCity ? AppTheme.syntaxYellow : ByteStarTheme.accent;
+  Color get _primaryBg => _isRuneCity ? AppTheme.ideBackground : ByteStarTheme.primary;
+  Color get _secondaryBg => _isRuneCity ? AppTheme.idePanel : ByteStarTheme.secondary;
+  Color get _success => _isRuneCity ? AppTheme.syntaxGreen : ByteStarTheme.success;
+  Color get _warning => _isRuneCity ? AppTheme.syntaxYellow : ByteStarTheme.warning;
+  TextStyle get _bodyStyle => _isRuneCity ? AppTheme.bodyStyle : ByteStarTheme.body;
+  TextStyle get _headingStyle => _isRuneCity ? AppTheme.headingStyle : ByteStarTheme.heading;
+  TextStyle get _codeStyle => _isRuneCity ? AppTheme.codeStyle : ByteStarTheme.code;
+
 
   void _playIntro() async {
     // Simulate video playback
@@ -177,23 +194,31 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
       }
     }
 
-    // Execute code via Judge0 (Language ID 50 = C)
+    // Execute code via Judge0
     ExecutionResult result;
     bool usingMock = false;
 
     try {
-      result = await _judge0Service.executeCode(_userCode, 50);
+      result = await _judge0Service.executeCode(_userCode, widget.mission.languageId);
       if (result.stderr.startsWith('API Error') || result.stderr.startsWith('Network Error')) {
         throw Exception(result.stderr); 
       }
     } catch (e) {
       usingMock = true;
-      final mockResult = await MockCCompiler.compileAndRun(_userCode);
-      result = ExecutionResult(
-        stdout: mockResult['stdout']!,
-        stderr: mockResult['stderr']!,
-        status: mockResult['stderr']!.isEmpty ? 'Accepted' : 'Compilation Error',
-      );
+      if (widget.mission.languageId == 50) {
+        final mockResult = await MockCCompiler.compileAndRun(_userCode);
+        result = ExecutionResult(
+          stdout: mockResult['stdout']!,
+          stderr: mockResult['stderr']!,
+          status: mockResult['stderr']!.isEmpty ? 'Accepted' : 'Compilation Error',
+        );
+      } else {
+        result = ExecutionResult(
+          stdout: '',
+          stderr: 'Offline simulator only supports C right now.',
+          status: 'Compilation Error',
+        );
+      }
     }
 
     if (!mounted) return;
@@ -366,16 +391,36 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ByteStarTheme.primary,
+      backgroundColor: _primaryBg,
       body: Stack(
         children: [
           // Background (Dynamic)
-          Positioned.fill(
-             child: AnimatedSpaceBackground(
-               sceneType: widget.mission.openingScene,
-               child: const SizedBox.expand(),
-             ),
-          ),
+          if (_isRuneCity)
+            Positioned.fill(child: CodeBackground())
+          else
+            Positioned.fill(
+               child: AnimatedSpaceBackground(
+                 sceneType: widget.mission.openingScene,
+                 child: const SizedBox.expand(),
+               ),
+            ),
+          if (_isRuneCity)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(-0.2, -0.6),
+                      radius: 1.1,
+                      colors: [
+                        AppTheme.syntaxYellow.withValues(alpha: 0.18),
+                        AppTheme.ideBackground.withValues(alpha: 0.95),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           
 
           // Ask AI FAB (Visible in Task Mode)
@@ -385,9 +430,12 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
               right: 16,
               child: FloatingActionButton.extended(
                 onPressed: _askNova,
-                backgroundColor: ByteStarTheme.accent,
+                backgroundColor: _accent,
                 icon: const Icon(Icons.auto_awesome, color: Colors.white),
-                label: const Text('Ask NOVA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                label: Text(
+                  _isRuneCity ? 'Ask LUNA' : 'Ask NOVA',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ).animate().scale(),
             ),
 
@@ -428,22 +476,22 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
   Widget _buildTopBar() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: ByteStarTheme.secondary,
+      color: _secondaryBg,
       child: Row(
         children: [
           IconButton(
-            icon: const Icon(Icons.arrow_back, color: ByteStarTheme.accent),
+            icon: Icon(Icons.arrow_back, color: _accent),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          Text(widget.mission.title, style: ByteStarTheme.heading.copyWith(fontSize: 18)),
+          Text(widget.mission.title, style: _headingStyle.copyWith(fontSize: 18)),
           const Spacer(),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              border: Border.all(color: ByteStarTheme.accent),
+              border: Border.all(color: _accent),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(widget.mission.concept, style: ByteStarTheme.code),
+            child: Text(widget.mission.concept, style: _codeStyle),
           ),
         ],
       ),
@@ -468,22 +516,32 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
   }
 
   Widget _buildIntroView() {
+    final bool isRuneCity = _isRuneCity;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Simulated Ship Entry
-          const Icon(Icons.rocket, size: 100, color: ByteStarTheme.accent)
+          // Simulated Entry
+          Icon(
+            isRuneCity ? Icons.auto_awesome : Icons.rocket,
+            size: 100,
+            color: _accent,
+          )
               .animate()
               .scale(begin: const Offset(0.0, 0.0), end: const Offset(1.5, 1.5), duration: 2.seconds, curve: Curves.elasticOut)
               .moveY(begin: 300, end: 0, duration: 1.5.seconds, curve: Curves.decelerate)
               .then()
-              .shake(duration: 500.ms), // Landing impact
+              .shimmer(duration: 800.ms, color: _accent.withValues(alpha: 0.4)),
               
           const SizedBox(height: 32),
           
-          Text(widget.mission.id == 'm1' ? 'INITIATING WAKE-UP SEQUENCE...' : 'APPROACHING NEXT OBJECTIVE...', 
-              style: ByteStarTheme.code.copyWith(letterSpacing: 2))
+          Text(
+              isRuneCity
+                  ? 'ETCHING THE NEXT RUNE...'
+                  : (widget.mission.id == 'm1'
+                      ? 'INITIATING WAKE-UP SEQUENCE...'
+                      : 'APPROACHING NEXT OBJECTIVE...'),
+              style: _codeStyle.copyWith(letterSpacing: 2))
               .animate(onPlay: (c) => c.repeat())
               .fadeIn(duration: 1.seconds)
               .fadeOut(delay: 1.seconds, duration: 1.seconds),
@@ -495,12 +553,12 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
             width: 250,
             child: Column(
               children: [
-                LinearProgressIndicator(backgroundColor: Colors.black, color: ByteStarTheme.accent, minHeight: 2)
+                LinearProgressIndicator(backgroundColor: Colors.black, color: _accent, minHeight: 2)
                     .animate(onPlay: (c) => c.repeat()).slideX(begin: -1, end: 1, duration: 1.seconds),
                 const SizedBox(height: 4),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: Text('SYSTEM CHECK... OK', style: TextStyle(color: ByteStarTheme.success, fontSize: 10))
+                  child: Text('SYSTEM CHECK... OK', style: TextStyle(color: _success, fontSize: 10))
                 ),
               ],
             ),
@@ -516,7 +574,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
       child: Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-            border: Border.all(color: ByteStarTheme.accent.withValues(alpha: 0.3)),
+            border: Border.all(color: _accent.withValues(alpha: 0.3)),
             shape: BoxShape.circle,
         ),
         child: const Icon(Icons.record_voice_over, size: 64, color: Colors.white24),
@@ -534,14 +592,14 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('LEARNING MODULE', style: ByteStarTheme.code.copyWith(color: ByteStarTheme.accent)),
+          Text('LEARNING MODULE', style: _codeStyle.copyWith(color: _accent)),
           const SizedBox(height: 16),
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                border: Border.all(color: ByteStarTheme.accent),
+                border: Border.all(color: _accent),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListView.builder(
@@ -559,14 +617,14 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                         SizedBox(
                           width: 30,
                           child: Text(
-                            '$lineNum', 
-                            style: ByteStarTheme.code.copyWith(color: Colors.grey),
+                          '$lineNum', 
+                            style: _codeStyle.copyWith(color: Colors.grey),
                           ),
                         ),
                         Expanded(
                           child: Text(
                             lines[index],
-                            style: ByteStarTheme.code.copyWith(
+                            style: _codeStyle.copyWith(
                               color: isHighlighted ? Colors.white : Colors.white70,
                               fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
                               fontFamily: 'Courier', // Ensure monospace
@@ -589,7 +647,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                step.visualAssetId == 'brackets' ? Icons.code :
                step.visualAssetId == 'check_mark' ? Icons.check_circle : Icons.info,
                size: 48,
-               color: ByteStarTheme.accent.withValues(alpha: 0.5),
+               color: _accent.withValues(alpha: 0.5),
              ).animate().scale().fadeIn(),
              
           const SizedBox(height: 100), // Space for NOVA overlay
@@ -605,19 +663,19 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
-          color: ByteStarTheme.secondary.withValues(alpha: 0.5),
+          color: _secondaryBg.withValues(alpha: 0.5),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('MISSION OBJECTIVE:', style: ByteStarTheme.code.copyWith(color: ByteStarTheme.warning)),
+              Text('MISSION OBJECTIVE:', style: _codeStyle.copyWith(color: _warning)),
               const SizedBox(height: 8),
-              Text(widget.mission.task.instruction, style: ByteStarTheme.body),
+              Text(widget.mission.task.instruction, style: _bodyStyle),
               if (widget.mission.task.hints.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     'HINT: ${widget.mission.task.hints.first}',
-                    style: ByteStarTheme.body.copyWith(color: Colors.white54, fontSize: 12),
+                    style: _bodyStyle.copyWith(color: Colors.white54, fontSize: 12),
                   ),
                 ),
             ],
@@ -638,20 +696,20 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
         // Run Button & Console
         Container(
           padding: const EdgeInsets.all(16),
-          color: ByteStarTheme.primary,
+          color: _primaryBg,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_isRunningCode)
                 Center(
-                  child: CircularProgressIndicator(color: ByteStarTheme.accent),
+                  child: CircularProgressIndicator(color: _accent),
                 )
               else
                 ElevatedButton(
                   onPressed: _runCode,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: ByteStarTheme.success,
-                    foregroundColor: Colors.black,
+                    backgroundColor: _accent,
+                    foregroundColor: AppTheme.ideBackground,
                     padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                   ),
@@ -674,7 +732,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                   decoration: BoxDecoration(
                     color: Colors.black,
                     border: Border.all(
-                      color: _currentState == MissionState.failure ? ByteStarTheme.warning : Colors.grey,
+                      color: _currentState == MissionState.failure ? _warning : Colors.grey,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -686,8 +744,8 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                         const SizedBox(height: 4),
                         Text(
                           _executionOutput.isEmpty ? 'Execution failed.' : _executionOutput,
-                          style: ByteStarTheme.code.copyWith(
-                            color: _currentState == MissionState.failure ? ByteStarTheme.warning : Colors.white,
+                          style: _codeStyle.copyWith(
+                            color: _currentState == MissionState.failure ? _warning : Colors.white,
                             fontSize: 12,
                           ),
                         ),
@@ -713,16 +771,16 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
             margin: const EdgeInsets.only(bottom: 20, right: 10),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: ByteStarTheme.secondary.withValues(alpha: 0.9),
-              border: Border.all(color: ByteStarTheme.accent),
+              color: _secondaryBg.withValues(alpha: 0.9),
+              border: Border.all(color: _accent),
               borderRadius: BorderRadius.circular(16),
-              boxShadow: const [BoxShadow(color: ByteStarTheme.accent, blurRadius: 10)],
+              boxShadow: [BoxShadow(color: _accent, blurRadius: 10)],
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('NOVA', style: ByteStarTheme.code.copyWith(color: ByteStarTheme.accent, fontSize: 12)),
+                Text(widget.mentorName, style: _codeStyle.copyWith(color: _accent, fontSize: 12)),
                 const SizedBox(height: 4),
                 // Dynamic Text content
                 Builder(
@@ -734,14 +792,14 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                     
                     return Text(
                       text,
-                      style: ByteStarTheme.body,
+                      style: _bodyStyle,
                     ).animate(key: ValueKey(keyVal)).custom(
                       duration: 40.ms * text.length, // Faster talking
                       builder: (context, value, child) {
                         final count = (text.length * value).toInt().clamp(0, text.length);
                         return Text(
                           text.substring(0, count),
-                          style: ByteStarTheme.body,
+                          style: _bodyStyle,
                         );
                       },
                     );
@@ -752,7 +810,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _currentState == MissionState.teaching ? _advanceTeachingStep : _advanceDialogue,
-                    child: Text('NEXT >>', style: ByteStarTheme.code),
+                    child: Text('NEXT >>', style: _codeStyle),
                   ),
                 ),
               ],
@@ -762,6 +820,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
         NovaHologram(
             size: 100,
             isTalking: _isSpeaking(),
+            accentColor: _isRuneCity ? AppTheme.syntaxYellow : null,
         ),
       ],
     );
@@ -778,20 +837,27 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                      const Icon(Icons.check_circle, color: ByteStarTheme.success, size: 100)
+                      Icon(Icons.check_circle, color: _accent, size: 100)
                           .animate().scale(curve: Curves.elasticOut),
                       const SizedBox(height: 24),
-                      Text('MISSION ACCOMPLISHED', style: ByteStarTheme.heading.copyWith(color: ByteStarTheme.success)),
+                      Text(
+                        'MISSION ACCOMPLISHED',
+                        style: _headingStyle.copyWith(color: _accent),
+                      ),
                       const SizedBox(height: 16),
-                      Text('Power systems restored.\nXP Gained: +50', textAlign: TextAlign.center, style: ByteStarTheme.body),
+                      Text('Power systems restored.\nXP Gained: +50', textAlign: TextAlign.center, style: _bodyStyle),
                       const SizedBox(height: 32),
                       ElevatedButton(
                           onPressed: () => Navigator.of(context).pop(true), // Return success
                           style: ElevatedButton.styleFrom(
-                              backgroundColor: ByteStarTheme.accent,
+                              backgroundColor: _accent,
                               foregroundColor: Colors.black,
                           ),
-                          child: const Text('Return to Orbit'),
+                          child: Text(
+                            widget.mentorName.toUpperCase() == 'LUNA'
+                                ? 'Return to Rune City'
+                                : 'Return to Orbit',
+                          ),
                       ),
                   ],
               ),

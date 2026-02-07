@@ -5,11 +5,13 @@ import '../../utils/bytestar_theme.dart';
 class NovaHologram extends StatefulWidget {
   final double size;
   final bool isTalking;
+  final Color? accentColor;
 
   const NovaHologram({
     super.key,
     this.size = 120,
     this.isTalking = false,
+    this.accentColor,
   });
 
   @override
@@ -36,6 +38,8 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final accent = widget.accentColor ?? ByteStarTheme.accent;
+    final highlight = widget.accentColor ?? ByteStarTheme.highlight;
     return SizedBox(
       width: widget.size,
       height: widget.size,
@@ -48,10 +52,10 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
             height: widget.size * 0.8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: ByteStarTheme.accent.withValues(alpha: 0.1),
+              color: accent.withValues(alpha: 0.1),
               boxShadow: [
                 BoxShadow(
-                  color: ByteStarTheme.accent.withValues(alpha: 0.2),
+                  color: accent.withValues(alpha: 0.2),
                   blurRadius: 20,
                   spreadRadius: 5,
                 ),
@@ -74,7 +78,7 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      ByteStarTheme.accent.withValues(alpha: 0.2),
+                      accent.withValues(alpha: 0.2),
                       Colors.transparent,
                     ],
                     stops: const [0.0, 0.5, 1.0],
@@ -87,7 +91,7 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
             child: Icon(
               Icons.face_retouching_natural, // Female AI face
               size: widget.size * 0.6,
-              color: ByteStarTheme.accent.withValues(alpha: 0.8),
+              color: accent.withValues(alpha: 0.8),
             ),
           ),
 
@@ -98,7 +102,7 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: ByteStarTheme.highlight.withValues(alpha: 0.3),
+                color: highlight.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -110,7 +114,7 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: ByteStarTheme.accent.withValues(alpha: 0.3),
+                color: accent.withValues(alpha: 0.3),
                 width: 1,
               ),
             ),
@@ -128,7 +132,7 @@ class _NovaHologramState extends State<NovaHologram> with SingleTickerProviderSt
                     width: 4,
                     height: 12,
                     decoration: BoxDecoration(
-                      color: ByteStarTheme.accent,
+                      color: accent,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   )

@@ -347,7 +347,7 @@ class _MissionNode extends StatelessWidget {
             ),
             child: Center(
               child: Icon(
-                isLocked ? Icons.lock : Icons.code,
+                isLocked ? Icons.lock : (mission.icon ?? Icons.code),
                 color: isLocked ? Colors.grey : ByteStarTheme.accent,
               ),
             ),

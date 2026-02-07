@@ -10,6 +10,7 @@ import '../../widgets/bytestar/nova_hologram.dart';
 import '../login_screen.dart';
 import '../bytestar/mission_map_screen.dart';
 import '../runecity/rune_city_dashboard.dart';
+import '../runecity/rune_city_mission_map_screen.dart';
 
 class MentorIntroductionScreen extends StatefulWidget {
   final String username;
@@ -99,6 +100,14 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
         ),
       );
     } else {
+      if (widget.selectedStoryMode == 'Rune City Quest' && widget.selectedLanguage == 'Python') {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => RuneCityMissionMapScreen(username: widget.username),
+          ),
+        );
+        return;
+      }
       // Navigate to Rune City Dashboard
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -119,7 +128,8 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isByteStar = widget.selectedStoryMode == 'ByteStar Arena';
+    final bool isByteStar = widget.selectedStoryMode == 'ByteStar Arena' ||
+        widget.selectedStoryMode == 'Byte Star Arena';
     
     return Scaffold(
       backgroundColor: isByteStar ? ByteStarTheme.primary : AppTheme.ideBackground,
@@ -202,6 +212,8 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
                       child: GamingButton(
                         text: isByteStar ? 'ENTER ARENA' : 'BEGIN JOURNEY',
                         onPressed: _beginJourney,
+                        backgroundColor: isByteStar ? ByteStarTheme.accent : AppTheme.syntaxYellow,
+                        textColor: isByteStar ? Colors.white : AppTheme.ideBackground,
                       ),
                     ).animate().fadeIn().slideY(begin: 0.5, end: 0),
                   

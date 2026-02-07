@@ -1,4 +1,6 @@
 
+import 'package:flutter/material.dart';
+
 class Mission {
   final String id;
   final String title;
@@ -9,6 +11,8 @@ class Mission {
   final List<String> dialogueLines;
   final TeachingModule? teachingModule; // New: Interactive line-by-line lesson
   final CodingTask task;
+  final int languageId; // Judge0 language id
+  final IconData? icon;
   final bool isLocked;
   final double x; // Map X coordinate (0.0 to 1.0)
   final double y; // Map Y coordinate (0.0 to 1.0)
@@ -23,6 +27,8 @@ class Mission {
     required this.dialogueLines,
     this.teachingModule,
     required this.task,
+    this.languageId = 50, // default C
+    this.icon,
     this.isLocked = true,
     required this.x,
     required this.y,
