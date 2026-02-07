@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
+import 'screens/phase1/system_awakening_screen.dart';
+import 'screens/phase1/mission1_screen.dart';
+import 'screens/home_screen.dart';
 import 'utils/theme.dart';
+import 'services/local_storage_service.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize local storage
+  await LocalStorageService().init();
+  
   runApp(const CodeQuestApp());
 }
 
@@ -33,6 +44,12 @@ class CodeQuestApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const SplashScreen(),
+      // Named routes for navigation
+      routes: {
+        '/story/python/phase1/opening': (context) => const SystemAwakeningScreen(),
+        '/story/python/mission': (context) => const Mission1Screen(),
+        '/home': (context) => const HomeScreen(),
+      },
     );
   }
 }

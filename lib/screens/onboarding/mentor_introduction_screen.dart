@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+
 import '../../utils/theme.dart';
 import '../../widgets/background/code_background.dart';
 import '../../widgets/onboarding/ai_mentor_widget.dart';
-import '../login_screen.dart';
+import '../../services/local_storage_service.dart';
+import '../../core/story_trigger_manager.dart';
+import '../phase1/system_awakening_screen.dart';
+import '../phase1/mission1_screen.dart';
+import '../home_screen.dart';
 
 class MentorIntroductionScreen extends StatefulWidget {
   final String username;
@@ -23,73 +27,54 @@ class MentorIntroductionScreen extends StatefulWidget {
 }
 
 class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
-  final FlutterTts _flutterTts = FlutterTts();
-  bool _isSpeaking = false;
   bool _showButton = false;
 
   @override
   void initState() {
     super.initState();
-    _initMentor();
+    // Simulate some initialization or animation delay if needed
+    Future.delayed(const Duration(milliseconds: 1500), () {
+      if (mounted) {
+        setState(() => _showButton = true);
+      }
+    });
   }
 
-  Future<void> _initMentor() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
+  Future<void> _continue() async {
+    // Save user preferences to local storage
+    final storage = LocalStorageService();
+    await storage.init();
     
-    // Configure TTS for natural female voice
-    await _flutterTts.setLanguage("en-US");
-    await _flutterTts.setVoice({"name": "Google US English", "locale": "en-US"});
-    
-    if (widget.selectedStoryMode == 'Rune City Quest') {
-      // Luna - Warm, friendly mentor
-      await _flutterTts.setPitch(1.1); // Slightly higher for female voice
-      await _flutterTts.setSpeechRate(0.48); // Slower, more natural
+    await storage.saveUsername(widget.username);
+    await storage.saveSelectedLanguage(widget.selectedLanguage);
+    await storage.saveSelectedStoryMode(widget.selectedStoryMode);
+    await storage.saveOnboardingCompleted(true);
+
+    // Check which story should be triggered
+    final triggerManager = StoryTriggerManager();
+    final route = await triggerManager.checkAndTriggerStory();
+
+    if (!mounted) return;
+
+    // Navigate to the appropriate screen
+    if (route != '/home') {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) {
+           if (route == '/story/python/phase1/opening') {
+             return const SystemAwakeningScreen();
+           } else if (route == '/story/python/mission') {
+             return const Mission1Screen();
+           }
+           return const HomeScreen();
+        }),
+        (route) => false,
+      );
     } else {
-      // Stella - Energetic, motivational coach
-      await _flutterTts.setPitch(1.15); // Higher pitch for energetic feel
-      await _flutterTts.setSpeechRate(0.52); // Slightly faster but still natural
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+        (route) => false,
+      );
     }
-
-    // Speak greeting
-    setState(() => _isSpeaking = true);
-    await _speak(_getGreeting());
-    
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (mounted) {
-      setState(() {
-        _isSpeaking = false;
-        _showButton = true;
-      });
-    }
-  }
-
-  String _getGreeting() {
-    final mentorName = widget.selectedStoryMode == 'Rune City Quest'
-        ? 'Luna'
-        : 'Stella';
-    
-    return "Welcome ${widget.username}! I'm $mentorName, your coding mentor. "
-        "You've chosen ${widget.selectedLanguage} and entered ${widget.selectedStoryMode}. "
-        "I'll guide you through your coding journey. Let's begin!";
-  }
-
-  Future<void> _speak(String text) async {
-    await _flutterTts.speak(text);
-  }
-
-  void _continue() {
-    // TODO: Navigate to dashboard
-    // For now, go back to login
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
-  }
-
-  @override
-  void dispose() {
-    _flutterTts.stop();
-    super.dispose();
   }
 
   @override
@@ -119,8 +104,8 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
                   // AI Mentor
                   AIMentorWidget(
                     storyMode: widget.selectedStoryMode,
-                    greeting: _getGreeting(),
-                    showWaveform: _isSpeaking,
+                    greeting: "Welcome ${widget.username}! You've chosen ${widget.selectedLanguage}. Let's begin!",
+                    showWaveform: false,
                   ),
 
                   const SizedBox(height: 60),
