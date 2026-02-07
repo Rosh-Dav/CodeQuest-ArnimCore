@@ -3,6 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../utils/theme.dart';
 import '../../widgets/background/code_background.dart';
 import '../../widgets/onboarding/selection_card.dart';
+import '../../widgets/onboarding/python_logo.dart';
+import '../../widgets/onboarding/c_logo.dart';
 import 'story_mode_selection_screen.dart';
 
 class LanguageSelectionScreen extends StatefulWidget {
@@ -89,11 +91,11 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Python Card
+                    // Python Card with custom logo
                     SelectionCard(
                       title: 'Python',
                       description: 'Beginner-friendly, versatile, and powerful for data science & AI',
-                      icon: Icons.code,
+                      customLogo: const PythonLogo(size: 100),
                       accentColor: AppTheme.syntaxBlue,
                       isSelected: _selectedLanguage == 'Python',
                       onTap: () => _selectLanguage('Python'),
@@ -101,11 +103,11 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
                     const SizedBox(width: 40),
 
-                    // C Programming Card
+                    // C Programming Card with custom logo
                     SelectionCard(
                       title: 'C',
                       description: 'System-level programming, performance-focused, foundational language',
-                      icon: Icons.memory,
+                      customLogo: const CLogo(size: 100),
                       accentColor: AppTheme.syntaxGreen,
                       isSelected: _selectedLanguage == 'C',
                       onTap: () => _selectLanguage('C'),
@@ -113,31 +115,95 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                   ],
                 ),
 
+
                 const Spacer(),
 
-                // Confirmation Text
+                // Impressive Selection Confirmation
                 if (_selectedLanguage != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     decoration: BoxDecoration(
-                      color: AppTheme.idePanel.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          (_selectedLanguage == 'Python'
+                              ? AppTheme.syntaxBlue
+                              : AppTheme.syntaxGreen).withValues(alpha: 0.3),
+                          (_selectedLanguage == 'Python'
+                              ? AppTheme.syntaxBlue
+                              : AppTheme.syntaxGreen).withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: _selectedLanguage == 'Python'
                             ? AppTheme.syntaxBlue
                             : AppTheme.syntaxGreen,
+                        width: 2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_selectedLanguage == 'Python'
+                              ? AppTheme.syntaxBlue
+                              : AppTheme.syntaxGreen).withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      '✓ You selected $_selectedLanguage',
-                      style: AppTheme.codeStyle.copyWith(
-                        color: _selectedLanguage == 'Python'
-                            ? AppTheme.syntaxBlue
-                            : AppTheme.syntaxGreen,
-                        fontSize: 16,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _selectedLanguage == 'Python'
+                                ? AppTheme.syntaxBlue
+                                : AppTheme.syntaxGreen,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Language Selected',
+                              style: AppTheme.codeStyle.copyWith(
+                                color: AppTheme.syntaxComment,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _selectedLanguage!,
+                              style: AppTheme.headingStyle.copyWith(
+                                color: _selectedLanguage == 'Python'
+                                    ? AppTheme.syntaxBlue
+                                    : AppTheme.syntaxGreen,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          color: _selectedLanguage == 'Python'
+                              ? AppTheme.syntaxBlue
+                              : AppTheme.syntaxGreen,
+                          size: 28,
+                        ),
+                      ],
                     ),
-                  ).animate().fadeIn().scale(),
+                  ).animate()
+                    .fadeIn(duration: 300.ms)
+                    .scale(begin: const Offset(0.8, 0.8), curve: Curves.elasticOut)
+                    .shimmer(delay: 400.ms, duration: 1.seconds, color: Colors.white24),
 
                 const SizedBox(height: 60),
               ],

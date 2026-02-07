@@ -38,14 +38,13 @@ class _AIMentorWidgetState extends State<AIMentorWidget> with SingleTickerProvid
 
   Color get _mentorColor {
     return widget.storyMode == 'Rune City Quest'
-        ? AppTheme.syntaxBlue
-        : AppTheme.syntaxYellow;
+        ? AppTheme.syntaxYellow
+        : AppTheme.syntaxBlue;
   }
 
   IconData get _mentorIcon {
-    return widget.storyMode == 'Rune City Quest'
-        ? Icons.school
-        : Icons.emoji_events;
+    // Female mentor character icon
+    return Icons.face;
   }
 
   @override

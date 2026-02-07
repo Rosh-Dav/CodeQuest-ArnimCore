@@ -36,15 +36,18 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
   Future<void> _initMentor() async {
     await Future.delayed(const Duration(milliseconds: 1500));
     
-    // Configure TTS based on story mode
+    // Configure TTS for natural female voice
     await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setVoice({"name": "Google US English", "locale": "en-US"});
     
     if (widget.selectedStoryMode == 'Rune City Quest') {
-      await _flutterTts.setPitch(1.0);
-      await _flutterTts.setSpeechRate(0.5);
+      // Luna - Warm, friendly mentor
+      await _flutterTts.setPitch(1.1); // Slightly higher for female voice
+      await _flutterTts.setSpeechRate(0.48); // Slower, more natural
     } else {
-      await _flutterTts.setPitch(1.1);
-      await _flutterTts.setSpeechRate(0.55);
+      // Stella - Energetic, motivational coach
+      await _flutterTts.setPitch(1.15); // Higher pitch for energetic feel
+      await _flutterTts.setSpeechRate(0.52); // Slightly faster but still natural
     }
 
     // Speak greeting
@@ -128,8 +131,8 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
                       onPressed: _continue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: widget.selectedStoryMode == 'Rune City Quest'
-                            ? AppTheme.syntaxBlue
-                            : AppTheme.syntaxYellow,
+                            ? AppTheme.syntaxYellow
+                            : AppTheme.syntaxBlue,
                         foregroundColor: AppTheme.ideBackground,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 48,

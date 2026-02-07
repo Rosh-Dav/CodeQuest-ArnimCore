@@ -92,55 +92,119 @@ class _StoryModeSelectionScreenState extends State<StoryModeSelectionScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Rune City Quest Card
+                    // Rune City Quest Card - Yellow theme
                     SelectionCard(
                       title: 'Rune City Quest',
                       description: 'Urban coding adventure with friendly mentorship and exploration',
                       icon: Icons.location_city,
-                      accentColor: AppTheme.syntaxBlue,
+                      accentColor: AppTheme.syntaxYellow,
                       isSelected: _selectedStoryMode == 'Rune City Quest',
                       onTap: () => _selectStoryMode('Rune City Quest'),
                     ).animate(delay: 400.ms).fadeIn().slideX(begin: -0.2, end: 0),
 
                     const SizedBox(width: 40),
 
-                    // Byte Star Arena Card
+                    // Byte Star Arena Card - Blue theme with rocket
                     SelectionCard(
                       title: 'Byte Star Arena',
                       description: 'Competitive coding challenges with energetic training and rankings',
-                      icon: Icons.emoji_events,
-                      accentColor: AppTheme.syntaxYellow,
+                      icon: Icons.rocket_launch,
+                      accentColor: AppTheme.syntaxBlue,
                       isSelected: _selectedStoryMode == 'Byte Star Arena',
                       onTap: () => _selectStoryMode('Byte Star Arena'),
                     ).animate(delay: 600.ms).fadeIn().slideX(begin: 0.2, end: 0),
                   ],
                 ),
 
+
                 const Spacer(),
 
-                // Confirmation Text
+                // Impressive Selection Confirmation
                 if (_selectedStoryMode != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                     decoration: BoxDecoration(
-                      color: AppTheme.idePanel.withValues(alpha: 0.8),
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        colors: [
+                          (_selectedStoryMode == 'Rune City Quest'
+                              ? AppTheme.syntaxYellow
+                              : AppTheme.syntaxBlue).withValues(alpha: 0.3),
+                          (_selectedStoryMode == 'Rune City Quest'
+                              ? AppTheme.syntaxYellow
+                              : AppTheme.syntaxBlue).withValues(alpha: 0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(
                         color: _selectedStoryMode == 'Rune City Quest'
-                            ? AppTheme.syntaxBlue
-                            : AppTheme.syntaxYellow,
+                            ? AppTheme.syntaxYellow
+                            : AppTheme.syntaxBlue,
+                        width: 2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (_selectedStoryMode == 'Rune City Quest'
+                              ? AppTheme.syntaxYellow
+                              : AppTheme.syntaxBlue).withValues(alpha: 0.5),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      '✓ You selected $_selectedStoryMode',
-                      style: AppTheme.codeStyle.copyWith(
-                        color: _selectedStoryMode == 'Rune City Quest'
-                            ? AppTheme.syntaxBlue
-                            : AppTheme.syntaxYellow,
-                        fontSize: 16,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: _selectedStoryMode == 'Rune City Quest'
+                                ? AppTheme.syntaxYellow
+                                : AppTheme.syntaxBlue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Story Mode Selected',
+                              style: AppTheme.codeStyle.copyWith(
+                                color: AppTheme.syntaxComment,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _selectedStoryMode!,
+                              style: AppTheme.headingStyle.copyWith(
+                                color: _selectedStoryMode == 'Rune City Quest'
+                                    ? AppTheme.syntaxYellow
+                                    : AppTheme.syntaxBlue,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        Icon(
+                          Icons.arrow_forward_rounded,
+                          color: _selectedStoryMode == 'Rune City Quest'
+                              ? AppTheme.syntaxYellow
+                              : AppTheme.syntaxBlue,
+                          size: 28,
+                        ),
+                      ],
                     ),
-                  ).animate().fadeIn().scale(),
+                  ).animate()
+                    .fadeIn(duration: 300.ms)
+                    .scale(begin: const Offset(0.8, 0.8), curve: Curves.elasticOut)
+                    .shimmer(delay: 400.ms, duration: 1.seconds, color: Colors.white24),
 
                 const SizedBox(height: 60),
               ],

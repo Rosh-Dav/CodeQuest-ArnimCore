@@ -5,7 +5,8 @@ import '../../utils/theme.dart';
 class SelectionCard extends StatefulWidget {
   final String title;
   final String description;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? customLogo;
   final Color accentColor;
   final VoidCallback onTap;
   final bool isSelected;
@@ -14,7 +15,8 @@ class SelectionCard extends StatefulWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.icon,
+    this.icon,
+    this.customLogo,
     required this.accentColor,
     required this.onTap,
     this.isSelected = false,
@@ -72,20 +74,24 @@ class _SelectionCardState extends State<SelectionCard> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Icon
+                // Icon or Custom Logo
                 Container(
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: widget.accentColor.withValues(alpha: 0.2),
-                    border: Border.all(
-                      color: widget.accentColor,
-                      width: 2,
-                    ),
+                    color: widget.customLogo != null 
+                        ? Colors.transparent 
+                        : widget.accentColor.withValues(alpha: 0.2),
+                    border: widget.customLogo != null 
+                        ? null 
+                        : Border.all(
+                            color: widget.accentColor,
+                            width: 2,
+                          ),
                   ),
-                  child: Icon(
-                    widget.icon,
+                  child: widget.customLogo ?? Icon(
+                    widget.icon!,
                     size: 50,
                     color: widget.accentColor,
                   ),
