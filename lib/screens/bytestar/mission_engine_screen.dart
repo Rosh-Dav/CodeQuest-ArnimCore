@@ -3,9 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../utils/bytestar_theme.dart';
 import '../../models/bytestar_data.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
-import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/c_code_editor.dart';
-import '../../widgets/bytestar/space_backgrounds.dart'; // Audio/Visual
 import '../../widgets/bytestar/animated_space_background.dart';
 import '../../services/judge0_service.dart';
 import '../../services/mock_c_compiler.dart';
@@ -293,7 +291,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
   bool _isQueryingGemini = false;
 
   Future<void> _askNova() async {
-    final TextEditingController _promptController = TextEditingController();
+    final TextEditingController promptController = TextEditingController();
     
     final query = await showDialog<String>(
       context: context,
@@ -301,7 +299,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
         backgroundColor: ByteStarTheme.cardBg,
         title: Text('Ask NOVA', style: ByteStarTheme.heading),
         content: TextField(
-          controller: _promptController,
+          controller: promptController,
           style: ByteStarTheme.body,
           decoration: InputDecoration(
             hintText: "What's on your mind, Cadet?",
@@ -317,7 +315,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
             child: Text('Cancel', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context, _promptController.text),
+            onPressed: () => Navigator.pop(context, promptController.text),
             child: Text('Transmit', style: ByteStarTheme.code.copyWith(color: ByteStarTheme.accent)),
           ),
         ],
@@ -336,7 +334,7 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
     String fullPrompt = query;
     if (_currentState == MissionState.task) {
       fullPrompt = "User Task: ${widget.mission.task.instruction}\n"
-          "User Code:\n${_userCode}\n\n"
+          "User Code:\n$_userCode\n\n"
           "Question: $query";
     }
 
@@ -384,10 +382,22 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
               bottom: 100,
               right: 16,
               child: FloatingActionButton.extended(
-                onPressed: _askNova,
+                onPressed: _isQueryingGemini ? null : _askNova,
                 backgroundColor: ByteStarTheme.accent,
-                icon: const Icon(Icons.auto_awesome, color: Colors.white),
-                label: const Text('Ask NOVA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                icon: _isQueryingGemini
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Icon(Icons.auto_awesome, color: Colors.white),
+                label: Text(
+                  _isQueryingGemini ? 'Querying...' : 'Ask NOVA',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ).animate().scale(),
             ),
 

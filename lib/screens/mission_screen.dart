@@ -25,7 +25,7 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
   Future<void> _loadMission() async {
-    final mission = await _storyEngine.getCurrentMission();
+    final mission = await _storyEngine.getCurrentMissionData();
     setState(() {
       _missionData = mission;
       _isLoading = false;

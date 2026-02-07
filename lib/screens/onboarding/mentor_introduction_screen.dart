@@ -13,7 +13,6 @@ import '../phase1/system_awakening_screen.dart';
 import '../phase1/mission1_screen.dart';
 import '../home_screen.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
-import '../login_screen.dart';
 import '../bytestar/mission_map_screen.dart';
 import '../runecity/rune_city_dashboard.dart';
 
@@ -111,6 +110,8 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
     // Check which story should be triggered using StoryTriggerManager
     final triggerManager = StoryTriggerManager();
     final route = await triggerManager.checkAndTriggerStory();
+
+    if (!mounted) return;
 
     // If triggerManager returns a route (meaning Python & ByteStar & Not Started), use it.
     if (route != '/home') {

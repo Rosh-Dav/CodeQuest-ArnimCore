@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:provider/provider.dart';
 import '../../utils/phase1_theme.dart';
 import '../../widgets/background/code_background.dart';
 import '../../services/story_state_service.dart';

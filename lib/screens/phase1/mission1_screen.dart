@@ -167,7 +167,7 @@ class _Mission1ScreenState extends State<Mission1Screen> {
                    // Since I can't use network images easily without checking permissions/connectivity and avoiding placeholders...
                    // I'll stick to a code-generated static effect or just skip the image.
                    // I'll use a fast flickering random container instead.
-                   errorBuilder: (_, __, ___) => const SizedBox(),
+                   errorBuilder: (context, error, stackTrace) => const SizedBox(),
                  ),
                ),
              ),

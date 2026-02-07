@@ -3,7 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../utils/bytestar_theme.dart';
 import '../../models/bytestar_data.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
-import '../../widgets/bytestar/space_backgrounds.dart';
 import '../../widgets/bytestar/animated_space_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mission_engine_screen.dart';
@@ -201,6 +200,7 @@ class _MissionMapScreenState extends State<MissionMapScreen> {
       await prefs.setStringList('unlockedMissions', unlockedMissionIds.toList());
     }
   }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ByteStarTheme.primary,
@@ -368,51 +368,7 @@ class _MissionNode extends StatelessWidget {
     );
   }
 }
-
-class _SpaceBackground extends StatelessWidget {
-  const _SpaceBackground();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: ByteStarTheme.primary,
-      ),
-      child: CustomPaint(
-        painter: _StarFieldPainter(),
-      ),
-    );
-  }
-}
-
-class _StarFieldPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withValues(alpha: 0.3);
-    // Draw simple stars
-    // In a real app, use random generation or static offsets
-    canvas.drawCircle(Offset(size.width * 0.1, size.height * 0.2), 1, paint);
-    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.1), 2, paint);
-    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.3), 1.5, paint);
-    canvas.drawCircle(Offset(size.width * 0.2, size.height * 0.8), 2, paint);
-    // Grid lines
-    final gridPaint = Paint()
-      ..color = ByteStarTheme.accent.withValues(alpha: 0.05)
-      ..strokeWidth = 1;
-      
-    for (double i = 0; i < size.width; i += 40) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), gridPaint);
-    }
-    for (double i = 0; i < size.height; i += 40) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), gridPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _MissionPathPainter extends CustomPainter {
+class _MissionPathPainter extends CustomPainter {
   final List<Mission> missions;
 
   _MissionPathPainter(this.missions);

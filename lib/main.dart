@@ -7,7 +7,6 @@ import 'firebase_options.dart';
 import 'services/gemini_service.dart';
 import 'services/local_storage_service.dart';
 import 'screens/splash_screen.dart';
-import 'screens/login_screen.dart';
 import 'screens/phase1/system_awakening_screen.dart';
 import 'screens/phase1/mission1_screen.dart';
 import 'screens/home_screen.dart';

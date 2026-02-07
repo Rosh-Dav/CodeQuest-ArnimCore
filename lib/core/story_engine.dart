@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../models/story_state.dart';
 import '../services/local_storage_service.dart';
 
@@ -107,7 +106,6 @@ class StoryEngine {
     }
 
     // Logic to advance to next mission
-    int nextPhase = state.currentPhase;
     int nextMission = state.currentMission + 1;
     
     // For this implementation limited to Mission 3
