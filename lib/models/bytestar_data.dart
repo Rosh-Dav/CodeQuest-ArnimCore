@@ -31,6 +31,7 @@ class Mission {
 
 enum SceneType {
   none,
+  deepSpace,     // Generic galaxy view
   darkSpaceship, // M1: Emergency lights, dark
   engineRoom,    // M2: Blue flickers
   cockpit,       // M3-M6 etc

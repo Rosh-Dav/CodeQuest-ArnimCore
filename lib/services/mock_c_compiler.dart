@@ -24,8 +24,8 @@ class MockCCompiler {
 
     if (matches.isEmpty && code.contains('printf')) {
       // Exist printf but didn't match regex -> syntax error?
-      // Check for missing semicolon
-      if (RegExp(r'printf.*[^;]\s*$').hasMatch(code)) {
+      // Check for missing semicolon (look for printf line ending without ;)
+      if (RegExp(r'printf.*[^;]\s*(\n|$)', multiLine: true).hasMatch(code)) {
          stderr.writeln("error: expected ';' before '}' token");
       }
     }

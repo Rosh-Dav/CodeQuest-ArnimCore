@@ -4,6 +4,7 @@ import '../../utils/bytestar_theme.dart';
 import '../../models/bytestar_data.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/space_backgrounds.dart';
+import '../../widgets/bytestar/animated_space_background.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'mission_engine_screen.dart';
 
@@ -205,10 +206,11 @@ class _MissionMapScreenState extends State<MissionMapScreen> {
       backgroundColor: ByteStarTheme.primary,
       body: Stack(
         children: [
-          // Background - Deep Space Grid
+          // Background - Deep Space Grid (Dynamic)
            Positioned.fill(
-            child: CustomPaint(
-              painter: DeepSpacePainter(),
+            child: AnimatedSpaceBackground(
+              sceneType: SceneType.deepSpace,
+              child: const SizedBox.expand(),
             ),
           ),
 

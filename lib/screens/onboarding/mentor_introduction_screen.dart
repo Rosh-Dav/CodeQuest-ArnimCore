@@ -72,12 +72,12 @@ class _MentorIntroductionScreenState extends State<MentorIntroductionScreen> {
 
   String get _mentorName {
     if (widget.selectedStoryMode == 'Rune City Quest') return 'Luna';
-    if (widget.selectedStoryMode == 'ByteStar Arena') return 'NOVA';
+    if (widget.selectedStoryMode == 'ByteStar Arena' || widget.selectedStoryMode == 'Byte Star Arena') return 'NOVA';
     return 'Guide';
   }
 
   String _getGreeting() {
-    if (widget.selectedStoryMode == 'ByteStar Arena') {
+    if (widget.selectedStoryMode == 'ByteStar Arena' || widget.selectedStoryMode == 'Byte Star Arena') {
       return "Welcome to the Arena, Cadet ${widget.username}. I am $_mentorName, your tactical AI. "
           "You've accessed the ${widget.selectedLanguage} systems. Prepare for training.";
     }

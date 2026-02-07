@@ -6,6 +6,7 @@ import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/nova_hologram.dart';
 import '../../widgets/bytestar/c_code_editor.dart';
 import '../../widgets/bytestar/space_backgrounds.dart'; // Audio/Visual
+import '../../widgets/bytestar/animated_space_background.dart';
 import '../../services/judge0_service.dart';
 import '../../services/mock_c_compiler.dart';
 import '../../services/gemini_service.dart'; // AI Logic
@@ -273,6 +274,19 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
           }
       } catch (e) {
           debugPrint("Gemini Hint Error: $e");
+          // Fallback if Gemini fails (Offline Mode)
+          if (!mounted) return;
+          if (_currentState == MissionState.failure) {
+             final fallbackHint = widget.mission.task.hints.isNotEmpty 
+                  ? "Hint: ${widget.mission.task.hints.first}"
+                  : "Check your syntax closer. Look for missing semicolons or typos.";
+             
+             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("NOVA: $fallbackHint"),
+                  backgroundColor: ByteStarTheme.accent,
+                  duration: const Duration(seconds: 5),
+              ));
+          }
       }
   }
 
@@ -355,14 +369,11 @@ class _MissionEngineScreenState extends State<MissionEngineScreen> {
       backgroundColor: ByteStarTheme.primary,
       body: Stack(
         children: [
-          // Background
+          // Background (Dynamic)
           Positioned.fill(
-             child: CustomPaint(
-               painter: widget.mission.openingScene == SceneType.darkSpaceship
-                   ? DarkSpaceshipPainter()
-                   : widget.mission.openingScene == SceneType.engineRoom
-                       ? EngineRoomPainter()
-                       : DeepSpacePainter(),
+             child: AnimatedSpaceBackground(
+               sceneType: widget.mission.openingScene,
+               child: const SizedBox.expand(),
              ),
           ),
           
