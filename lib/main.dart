@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'services/gemini_service.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/phase1/system_awakening_screen.dart';
@@ -9,12 +11,22 @@ import 'screens/home_screen.dart';
 import 'utils/theme.dart';
 import 'services/local_storage_service.dart';
 
-void main() async {
-  // Ensure Flutter bindings are initialized
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize local storage
+  // Initialize local storage (Required for StoryTriggerManager)
   await LocalStorageService().init();
+
+  try {
+    await dotenv.load(fileName: ".env");
+    // Initialize Gemini Service
+    if (dotenv.env['GEMINI_API_KEY'] != null) {
+      GeminiService().init(dotenv.env['GEMINI_API_KEY']!);
+    }
+  } catch (e) {
+    debugPrint("Warning: Failed to load .env file: $e");
+    // Continue running app even if env fails
+  }
   
   runApp(const CodeQuestApp());
 }

@@ -21,7 +21,7 @@ class StoryTriggerManager {
       return false; // Already started, should depend on saved state where to go
     }
 
-    return language == 'Python' && storyMode == 'Byte Star Arena';
+    return language == 'Python' && (storyMode == 'Byte Star Arena' || storyMode == 'ByteStar Arena');
   }
 
   /// Checks stored preferences and determines the next route
@@ -34,10 +34,8 @@ class StoryTriggerManager {
       return '/story/python/phase1/opening';
     }
     
-    // If story is already started, we might want to go to mission select or continue
-    // For now, default to home or mission 1 if active
-    if (await _storyState.storyStarted) {
-       // Could route to mission 1 directly
+    // If story is already started AND we are in Python ByteStar mode
+    if (_storyState.storyStarted && language == 'Python' && (storyMode == 'Byte Star Arena' || storyMode == 'ByteStar Arena')) {
        return '/story/python/mission';
     }
 
