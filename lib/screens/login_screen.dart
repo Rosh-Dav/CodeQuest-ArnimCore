@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../widgets/background/animated_background.dart';
+import '../../widgets/background/code_background.dart';
 import '../../widgets/auth/auth_panel.dart';
 import '../../widgets/ai/ai_bot_overlay.dart';
 
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          const AnimatedBackground(),
+          const CodeBackground(),
           
           AnimatedOpacity(
             opacity: _showAIBot ? 0.0 : 1.0,

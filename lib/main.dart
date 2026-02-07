@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'utils/theme.dart';
 
@@ -31,7 +32,7 @@ class CodeQuestApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

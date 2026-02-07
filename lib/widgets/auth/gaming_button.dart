@@ -4,13 +4,11 @@ import '../../utils/theme.dart';
 class GamingButton extends StatefulWidget {
   final String text;
   final VoidCallback onPressed;
-  final bool isSecondary;
 
   const GamingButton({
     super.key,
     required this.text,
     required this.onPressed,
-    this.isSecondary = false,
   });
 
   @override
@@ -18,82 +16,57 @@ class GamingButton extends StatefulWidget {
 }
 
 class _GamingButtonState extends State<GamingButton> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-
-  bool _isPressed = false;
+  bool _isHovering = false;
+  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    _controller = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 1000))..repeat();
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
-      onTap: widget.onPressed,
-      child: AnimatedScale(
-        scale: _isPressed ? 0.95 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        child: AnimatedBuilder(
-          animation: _pulseController,
-          builder: (context, child) {
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: widget.isSecondary 
-                    ? LinearGradient(
-                        colors: [
-                          Colors.transparent,
-                          AppTheme.neonPurple.withValues(alpha: 0.2),
-                        ],
-                      )
-                    : LinearGradient(
-                        colors: [
-                          AppTheme.neonPurple,
-                          AppTheme.neonBlue,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                border: Border.all(
-                    color: widget.isSecondary ? AppTheme.neonBlue : Colors.transparent,
-                    width: 1.5,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onPressed,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: double.infinity,
+          height: 50,
+          decoration: BoxDecoration(
+            color: AppTheme.accentColor,
+            borderRadius: BorderRadius.circular(6),
+            boxShadow: [
+              if (_isHovering)
+                BoxShadow(
+                  color: AppTheme.accentColor.withValues(alpha: 0.4),
+                  blurRadius: 12,
+                  spreadRadius: 2,
                 ),
-                boxShadow: widget.isSecondary
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: AppTheme.neonPurple.withValues(alpha: 0.5 + (_pulseController.value * 0.2)),
-                          blurRadius: 10 + (_pulseController.value * 5),
-                          spreadRadius: 1,
-                        ),
-                      ],
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+               const Icon(Icons.play_arrow_rounded, color: Colors.white),
+               const SizedBox(width: 8),
+               Text(
+                widget.text,
+                style: AppTheme.buttonStyle,
               ),
-              child: Center(
-                child: Text(
-                  widget.text,
-                  style: AppTheme.buttonStyle.copyWith(
-                    color: widget.isSecondary ? AppTheme.electricCyan : Colors.white,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
